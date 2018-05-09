@@ -1,57 +1,428 @@
 # stringr {#stringr}
+```{r}
+library(stringr)
+```
 
-## case ()
+## Pattern matching
 
-## invert_match ()
+### str_count
 
-## modifiers ()
+Count the number of matches in a string
 
-## stringr-data ()
+Examples:
+```{r}
+fruit <- c("apple", "banana", "pear", "pineapple")
+str_count(fruit, "a")
+str_count(fruit, "p")
+str_count(fruit, "e")
+str_count(fruit, c("a", "b", "p", "p"))
+str_count(c("a.", "...", ".a.a"), ".")
+str_count(c("a.", "...", ".a.a"), fixed("."))
+```
 
-## str_c ()
+### str_detect
 
-## str_conv ()
+Detect the presence or absence of a pattern in a string.
 
-## str_count ()
+Examples:
+```{r str_detect}
+fruit <- c("apple", "banana", "pear", "pinapple")
+str_detect(fruit, "a")
+str_detect(fruit, "^a")
+str_detect(fruit, "a$")
+str_detect(fruit, "b")
+str_detect(fruit, "[aeiou]")
+## Also vectorised over pattern
+str_detect("aecfg", letters)
+```
 
-## str_detect ()
+### str_extract
 
-## str_dup ()
+Extract matching patterns from a string.
 
-## str_extract ()
+Examples:
+```{r string extract}
+shopping_list <- c("apples x4", "bag of flour", "bag of sugar", "milk x2")
+str_extract(shopping_list, "\\d")
 
-## str_flatten ()
+str_extract(shopping_list, "[a-z]+")
 
-## str_glue ()
+str_extract(shopping_list, "[a-z]{1,4}")
 
-## str_length ()
+str_extract(shopping_list, "\\b[a-z]{1,4}\\b")
 
-## str_locate ()
+## Extract all matches
+str_extract_all(shopping_list, "[a-z]+")
 
-## str_match ()
+str_extract_all(shopping_list, "\\b[a-z]+\\b")
 
-## str_order ()
+str_extract_all(shopping_list, "\\d")
 
-## str_pad ()
+## Simplify results into character matrix
+str_extract_all(shopping_list, "\\b[a-z]+\\b", simplify = TRUE)
 
-## str_remove ()
+str_extract_all(shopping_list, "\\d", simplify = TRUE)
 
-## str_replace ()
+## Extract all words
+str_extract_all("This is, suprisingly, a sentence.", boundary("word"))
+```
 
-## str_replace_na ()
+### str_extract_all
 
-## str_split ()
+str_extract_all(string, pattern, simplify = FALSE)
 
-## str_sub ()
+Examples:
+```{r str_extract-all}
+shopping_list <- c("apples x4", "bag of flour", "bag of sugar", "milk x2")
 
-## str_subset ()
+str_extract(shopping_list, "\\d")
 
-## str_trim ()
+str_extract(shopping_list, "[a-z]+")
 
-## str_trunc ()
+str_extract(shopping_list, "[a-z]{1,4}")
 
-## str_view ()
+str_extract(shopping_list, "\\b[a-z]{1,4}\\b")
 
-## str_wrap ()
+## Extract all matches
+str_extract_all(shopping_list, "[a-z]+")
 
-## word ()
+str_extract_all(shopping_list, "\\b[a-z]+\\b")
+
+str_extract_all(shopping_list, "\\d")
+
+str_extract_all(shopping_list, "\\b[a-z]+\\b", simplify = TRUE)
+
+str_extract_all(shopping_list, "\\d", simplify = TRUE)
+
+str_extract_all("This is, suprisingly, a sentence.", boundary("word"))
+
+```
+
+## Locate the position of patterns in a string.
+
+### str_locate(string, pattern)
+
+For str_locate, an integer matrix. First column gives start postion of match, and second column gives end position. For str_locate_all a list of integer matrices.
+
+Vectorised over string and pattern. If the match is of length 0, (e.g. from a special match like $) end will be one character less than start.
+
+Examples str_locate and str_locate_all:
+```{r str_locate}
+fruit <- c("apple", "banana", "pear", "pineapple")
+str_locate(fruit, "$")
+
+str_locate(fruit, "a")
+
+str_locate(fruit, "e")
+
+str_locate(fruit, c("a", "b", "p", "p"))
+
+str_locate_all(fruit, "a")
+
+str_locate_all(fruit, "e")
+
+## Find location of every character
+str_locate_all(fruit, "")
+
+```
+
+## Extract matched groups from a string.
+
+Vectorised over string and pattern.
+
+str_match(string, pattern)
+
+str_match_all(string, pattern)
+
+For str_match, a character matrix. First column is the complete match, followed by one column for each capture group. For str_match_all, a list of character matrices.
+
+Examples:
+```{r str_match}
+
+
+strings <- c(" 219 733 8965", "329-293-8753 ", "banana", "595 794 7569",
+  "387 287 6718", "apple", "233.398.9187  ", "482 952 3315",
+  "239 923 8115 and 842 566 4692", "Work: 579-499-7527", "$1000",
+  "Home: 543.355.3679")
+phone <- "([2-9][0-9]{2})[- .]([0-9]{3})[- .]([0-9]{4})"
+
+str_extract(strings, phone)
+
+str_match(strings, phone)
+
+## Extract/match all
+str_extract_all(strings, phone)
+
+str_match_all(strings, phone)
+x <- c("<a> <b>", "<a> <>", "<a>", "", NA)
+str_match(x, "<(.*?)> <(.*?)>")
+str_match_all(x, "<(.*?)>")
+
+str_extract(x, "<.*?>")
+
+str_extract_all(x, "<.*?>")
+
+
+```
+
+### str_to_upper ()
+
+str_to_upper (string)
+
+Convert case of a string.
+
+Example:
+```{r str_to_upper} 
+exstring <- "the example string"
+str_to_upper(exstring)
+```
+
+### invert_match ()
+
+invert_match (string)
+
+Invert a matrix of match locations to match the opposite of what was previously matched.
+
+Example:
+```{r invert_match} 
+numbers <- "1 and 2 and 4 and 456"
+num_loc <- str_locate_all(numbers, "[0-9]+")[[1]]
+str_sub(numbers, num_loc[, "start"], num_loc[, "end"])
+
+text_loc <- invert_match(num_loc)
+str_sub(numbers, text_loc[, "start"], text_loc[, "end"])
+
+```
+
+### modifiers ()
+
+### stringr-data ()
+
+### str_c ()
+
+### str_conv ()
+str_conv(string, encoding)
+
+This is a convenient way to override the current encoding of a string.
+
+```{r str_conv}
+x <- rawToChar(as.raw(177))
+x
+str_conv(x, "ISO-8859-2")
+str_conv(x, "ISO-8859-1")
+```
+
+### str_count ()
+
+str_count(string, pattern = "")
+
+Count The Number Of Matches In A String.
+
+Example:
+```{r str_count}
+fruit <- c("apple", "banana", "pear", "pineapple")
+str_count(fruit, "a")
+str_count(fruit, "p")
+str_count(fruit, "e")
+str_count(fruit, c("a", "b", "p", "p"))
+```
+
+
+### str_dup ()
+
+str_dup(string, times)
+
+Duplicate And Concatenate Strings Within A Character Vector.
+
+Example:
+```{r str_dup}
+fruit <- c("apple", "pear", "banana")
+str_dup(fruit, 2)
+str_dup(fruit, 1:3)
+str_c("ba", str_dup("na", 0:5))
+```
+
+
+### str_flatten ()
+
+str_flatten(string, collapse = "")
+
+Flatten a string
+
+Example:
+```{r str_flatten}
+str_flatten(letters)
+str_flatten(letters, "-")
+```
+
+
+### str_glue ()
+
+str_glue(..., .sep = "", .envir = parent.frame())
+
+These functions are wrappers around glue::glue() and glue::glue_data(), which provide a powerful and elegant syntax for interpolating strings. These wrappers provide a small set of the full options. Use the functions directly from glue for more control.
+
+Example:
+```{r str_glue}
+name <- "Fred"
+age <- 50
+anniversary <- as.Date("1991-10-12")
+str_glue(
+  "My name is {name}, ",
+  "my age next year is {age + 1}, ",
+  "and my anniversary is {format(anniversary, '%A, %B %d, %Y')}."
+)
+```
+
+### str_length ()
+
+str_length(string)
+
+Returns The Length Of A String.
+
+Example:
+```{r str_length}
+str_length(c("i", "like", "Ice Cream", NA))
+```
+
+
+### str_match ()
+
+### str_order ()
+
+str_order takes a character vector as input and returns an integer vector.  It can also sort digits numerically if `numeric = TRUE` is flagged (default is FALSE).
+Example:
+```{r str_order}
+groceries <- c("Apples", "Oranges", "Bananas", "Watermelon", "Strawberry")
+
+# Return integer vector
+str_order(groceries)
+
+# How to sort
+groceries[str_order(groceries)]
+
+# Numerical sort
+numbers <- c("1000", "500000", "2ab", "117")
+numbers[str_order(numbers, numeric = TRUE)]
+numbers[str_order(numbers)]
+```
+
+### str_pad ()
+
+Add characters (typically " ") to a string at the specified location such that its width is >= the minimum specified width
+*str_pad(string, width, side = c("left", "right", "both"), pad = " ")*
+
+```{r str_pad}
+ 
+my.string <- "this test string is good!!!" 
+
+str_pad(my.string,50,"left")
+str_pad(my.string,50,"right")
+
+```
+
+
+### str_remove ()
+
+### str_replace ()
+
+str_replace can be used to replace a pattern within a string and takes the form:  *str_replace(string,pattern,replacement)*
+
+Where "string" is your input string, "pattern" is the pattern that you are looking to replace, which can be either a regular expression, or a fixed string, and replacement is your desired replacement value.
+
+
+```{r str_replace}
+ 
+my.string <- "this test string is good!!!" 
+
+#replace exclamation marks with a period via regex matching
+str_replace(my.string,'\\!+',".")
+
+#replace a fixed string by using fixed()
+str_replace(my.string,"good","great")
+
+```
+
+
+### str_replace_na ()
+
+
+
+### str_split ()
+
+str_split splits a string into multiple pieces based on a defined pattern.  It splits the target string on as many occurences of the pattern as are found, unless instructed otherwise.  Also note that the pattern characters are not returns in the split strings.  It takes the following form:
+*str_split(my.string,pattern,n)*
+
+
+
+```{r str_split}
+ 
+my.string <- "this test string is good!!!" 
+
+#split the string on spaces, to a max of 3 splits
+str_split(my.string,"[[:space:]]",n=3)
+
+#Split my.string on the letter "e"
+str_split(my.string,'e')
+
+```
+
+### str_sub ()
+
+Extract a substring from a character vector.  This function allows you to pull pieces out of larger strings based on an index.
+
+```{r str_sub}
+ 
+my.string <- "this test string is good!!!" 
+
+
+
+#get the first 10 characters of the string
+str_sub(my.string,end=10)
+
+#get the first 5th to the 10th characters of the string
+str_sub(my.string,5,10)
+
+#get the last 10 characters of the string using a negative index
+str_sub(my.string,-10)
+
+```
+
+### str_subset ()
+
+### str_trim ()
+
+Removes whitespace from the start of a string.
+
+```{r str_trim}
+ 
+my.string <- "     this test string is good!!!" 
+
+#strip the whitespace from the string
+str_trim(my.string)
+
+
+```
+
+### str_trunc ()
+
+Truncate a character string.  Essentially this function reduces a string to the specified number of characters or less.
+
+*str_trunc(string, width, side = c("right", "left", "center"),ellipsis = "...")*
+
+```{r str_trunc}
+ 
+my.string <- "this test string is good!!!" 
+
+#truncate the string down to the specified number of characters, from the location specified
+str_trunc(my.string,15,"right")
+str_trunc(my.string,15,"center")
+
+```
+
+
+### str_view ()
+
+### str_wrap ()
+
+### word ()
