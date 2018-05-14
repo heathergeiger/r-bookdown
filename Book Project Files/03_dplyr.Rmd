@@ -191,7 +191,13 @@ name and the column name(s) as input and re arranges the columns based on input.
 
 
 ## mutate() and transmute()
+Computes and adds new variable(s). Preserves existing variables.
 
+```{r}
+mutate(my_data,
+       sepal_by_petal_l = Sepal.Length/Petal.Length
+       )
+ ```
 
 ## summarise()
 
